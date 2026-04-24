@@ -1,0 +1,20 @@
+# Dev directories
+.vs/
+.idea/
+node_modules/
+
+# Build
+dist/
+database/
+
+# Configs
+src/config/*.config.ts
+.env
+
+# Yarn files
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

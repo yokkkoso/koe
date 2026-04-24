@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/prisma/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model PrivateChannel {
+  channelId String    @id
+  guildId   String
+  userId    String
+  renameAt  DateTime?
+
+  @@map("voice_privates")
+}
+
+model PrivatesConfig {
+  guildId       String           @id
+  buttonsPerRow Int              @default(5)
+  buttons       PrivatesButton[]
+
+  @@map("voice_privates_configs")
+}
+
+model PrivatesButton {
+  id       Int               @id @default(autoincrement())
+  guildId  String
+  type     PrivateButtonType
+  emoji    String
+  position Int
+  config   PrivatesConfig    @relation(fields: [guildId], references: [guildId])
+
+  @@map("voice_privates_buttons")
+}
+
+enum PrivateButtonType {
+  ACCESS_GIVE
+  ACCESS_TAKE
+  ACCESS_GIVE_TAKE
+
+  HIDE
+  SHOW
+  HIDE_SHOW
+
+  LOCK
+  UNLOCK
+  LOCK_UNLOCK
+
+  MUTE
+  UNMUTE
+  MUTE_UNMUTE
+
+  RENAME
+  KICK
+  TRANSFER
+  USER_LIMIT
+}

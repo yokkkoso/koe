@@ -1,0 +1,15 @@
+{
+	"extends": "@yokkkoso/ts-config",
+	"compilerOptions": {
+		"skipLibCheck": true,
+		"outDir": "./dist",
+		"baseUrl": ".",
+		"paths": {
+			"@src/*": [ "./src/*" ],
+			"@config/*": ["src/config/*"],
+			"@shared/*": ["src/shared/*"],
+			"@prisma-client": ["src/prisma/generated/client.js"]
+		}
+	},
+	"include": ["src/**/*.ts"]
+}
