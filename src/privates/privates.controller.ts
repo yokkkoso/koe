@@ -95,9 +95,12 @@ export class PrivatesController {
 			return;
 		}
 
+		const executor = await channel.client.users.fetch(executorId).catch(() => null);
+
 		if (
 			executorId !== channel.client.user.id
 			&& executorId !== privateChannel.userId
+			&& !executor?.bot
 			&& !MainConfig.adminUserIds.includes(executorId)
 		) {
 			await (channel as GuildChannel).edit({
