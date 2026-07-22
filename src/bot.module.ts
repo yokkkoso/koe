@@ -20,12 +20,8 @@ import { NecordExceptionFilter } from './shared/filters/necord-exceptions.filter
 			inject: [ConfigService],
 			useFactory: (configService: ConfigService) => ({
 				token: configService.getOrThrow<string>('DISCORD_TOKEN'),
-				prefix: '!',
 				intents: [
 					'Guilds',
-					'GuildMessages',
-					'MessageContent',
-					'GuildMembers',
 					'GuildVoiceStates',
 				],
 				makeCache: Options.cacheWithLimits({

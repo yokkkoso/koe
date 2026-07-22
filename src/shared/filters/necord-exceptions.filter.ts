@@ -30,23 +30,5 @@ export class NecordExceptionFilter implements ExceptionFilter {
 				});
 			}
 		}
-
-		if (discovery.isTextCommand()) {
-			const [message] = necordHost.getContext<'messageCreate'>();
-			const description = discovery.getDescription();
-
-			if (exception.deleteCommand && message.deletable) {
-				message.delete().catch(() => {});
-			}
-
-			await message.channel.send({
-				embeds: [
-					baseEmbed()
-						.setTitle(description)
-						.setThumbnail(message.author.displayAvatarURL({ extension: 'png' }))
-						.setDescription(`${message.author.toString()}, ${exception.message}`),
-				],
-			});
-		}
 	}
 }

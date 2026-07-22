@@ -9,7 +9,7 @@ Discord bot for private ("join-to-create") voice channels, written in TypeScript
 ## Features
 
 - **Join-to-create** channels: joining a designated voice channel instantly spawns a private room and moves the user into it.
-- Per-guild **interactive control panel** on buttons — which buttons to expose, their order, and the number of buttons per row are all configurable via the `!privates` text command.
+- Per-guild **interactive control panel** on buttons — which buttons to expose, their order, and the number of buttons per row are all configurable via the `/privates` slash command.
 - Owner actions: access give / take, hide / show, lock / unlock, mute / unmute, rename, kick, transfer ownership, user limit.
 - **Ownership protection** — permission overrides made on a private channel by someone other than its owner are reverted via audit-log checks.
 - Empty private channels are auto-deleted; state is recovered on restart.
@@ -88,7 +88,7 @@ For development use `yarn start:dev` (hot reload).
 
 ## Usage
 
-On a configured guild, run `!privates` with an account that has administrator rights — the bot replies with the panel configuration message. Add/remove buttons, reorder them, pick how many appear per row, then send the finalized panel to the channel where your users live. End users press the buttons on that panel to manage their own private voice room.
+On a configured guild, run `/privates` with an account that has administrator rights — the bot replies with the panel configuration message. Add/remove buttons, reorder them, pick how many appear per row, then send the finalized panel to the channel where your users live. End users press the buttons on that panel to manage their own private voice room.
 
 ## License
 

@@ -12,13 +12,11 @@ export class AdministratorGuard implements CanActivate {
 		const necordHost = NecordExecutionContext.create(context);
 		const discovery = necordHost.getDiscovery();
 
-		if (!discovery.isTextCommand() && !discovery.isSlashCommand()) {
+		if (!discovery.isSlashCommand()) {
 			return true;
 		}
 
-		const [command] = discovery.isSlashCommand()
-			? necordHost.getContext<'interactionCreate'>()
-			: necordHost.getContext<'messageCreate'>();
+		const [command] = necordHost.getContext<'interactionCreate'>();
 
 		if (!(command.member instanceof GuildMember)) {
 			throw new CommandsException({

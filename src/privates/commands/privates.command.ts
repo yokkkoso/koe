@@ -10,9 +10,8 @@ import {
 	inlineCode,
 	type MessageActionRowComponentBuilder,
 	type StringSelectMenuBuilder,
-	TextChannel,
 } from 'discord.js';
-import { Context, TextCommand, type TextCommandContext } from 'necord';
+import { Context, SlashCommand, type SlashCommandContext } from 'necord';
 import { dedent } from 'ts-dedent';
 import {
 	privatesMessageButtonAdd,
@@ -32,18 +31,20 @@ export class PrivatesCommand {
 	) {}
 
 	@UseGuards(AdministratorGuard)
-	@TextCommand({
+	@SlashCommand({
 		name: 'privates',
 		description: 'Настройка приватных каналов',
+		defaultMemberPermissions: 'Administrator',
+		dmPermission: false,
 	})
 	public async onPrivatesCommand (
-		@Context() [message]: TextCommandContext,
+		@Context() [interaction]: SlashCommandContext,
 	): Promise<void> {
-		if (!PrivatesConfig.guilds[message.guildId!]) {
+		if (!PrivatesConfig.guilds[interaction.guildId!]) {
 			return;
 		}
 
-		const config = await this.privatesService.getPrivateConfig(message.guildId!);
+		const config = await this.privatesService.getPrivateConfig(interaction.guildId!);
 
 		const buttons = config.buttons.toSorted((a, b) => a.position - b.position);
 
@@ -60,9 +61,9 @@ export class PrivatesCommand {
 		const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
 			new ActionRowBuilder<ButtonBuilder>()
 				.addComponents(
-					privatesMessageButtonAdd(message.author.id, expTime),
-					privatesMessageButtonDelete(message.author.id, expTime),
-					privatesMessageButtonsPerRow(message.author.id, expTime),
+					privatesMessageButtonAdd(interaction.user.id, expTime),
+					privatesMessageButtonDelete(interaction.user.id, expTime),
+					privatesMessageButtonsPerRow(interaction.user.id, expTime),
 				),
 		];
 
@@ -70,21 +71,21 @@ export class PrivatesCommand {
 			components.push(
 				new ActionRowBuilder<StringSelectMenuBuilder>()
 					.addComponents(
-						privatesMessageButtonPosition(message.author.id, expTime, buttons),
+						privatesMessageButtonPosition(interaction.user.id, expTime, buttons),
 					),
 				new ActionRowBuilder<ButtonBuilder>()
 					.addComponents(
-						privatesMessagePreview(message.author.id, expTime),
-						privatesMessageSend(message.author.id, expTime),
+						privatesMessagePreview(interaction.user.id, expTime),
+						privatesMessageSend(interaction.user.id, expTime),
 					),
 			);
 		}
 
-		await (message.channel as TextChannel).send({
+		await interaction.reply({
 			embeds: [
 				baseEmbed()
 					.setTitle('Настройка сообщения для управления приватным каналом')
-					.setThumbnail(message.author.displayAvatarURL({ extension: 'png' }))
+					.setThumbnail(interaction.user.displayAvatarURL({ extension: 'png' }))
 					.setDescription(
 						dedent`
 							Количество кнопок в линии: ${config.buttonsPerRow}

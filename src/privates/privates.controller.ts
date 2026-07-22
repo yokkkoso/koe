@@ -22,6 +22,12 @@ export class PrivatesController {
 				continue;
 			}
 
+			for (const voiceState of guild.voiceStates.cache.values()) {
+				if (voiceState.channelId && !voiceState.member) {
+					await guild.members.fetch(voiceState.id).catch(() => {});
+				}
+			}
+
 			const privateChannels = await this.privatesService.getPrivateChannels(guildId);
 
 			for (const privateChannel of privateChannels) {
@@ -33,7 +39,10 @@ export class PrivatesController {
 					continue;
 				}
 
-				if (channel.members.filter((member) => !member.user.bot).size <= 0) {
+				const occupants = guild.voiceStates.cache.filter((state) => state.channelId === channel.id
+					&& !state.member?.user.bot);
+
+				if (occupants.size <= 0) {
 					await channel.delete().catch(() => {});
 
 					await this.privatesService.deletePrivateChannel(privateChannel.channelId);
@@ -113,7 +122,10 @@ export class PrivatesController {
 	public async onVoiceChannelLeave (
 		@Context() [, channel]: ContextOf<'voiceChannelLeave'>,
 	): Promise<void> {
-		if (channel.members.filter((member) => !member.user.bot).size <= 0) {
+		const occupants = channel.guild.voiceStates.cache.filter((state) => state.channelId === channel.id
+			&& !state.member?.user.bot);
+
+		if (occupants.size <= 0) {
 			if (!await this.privatesService.isPrivateChannel(channel.id)) {
 				return;
 			}
@@ -215,8 +227,11 @@ export class PrivatesController {
 			return;
 		}
 
+		const oldChannelOccupants = oldChannel.guild.voiceStates.cache.filter((state) => state.channelId === oldChannel.id
+			&& !state.member?.user.bot);
+
 		if (
-			oldChannel.members.filter((member) => !member.user.bot).size <= 0
+			oldChannelOccupants.size <= 0
 			&& await this.privatesService.isPrivateChannel(oldChannel.id)
 		) {
 			await oldChannel.delete().catch(() => {});
