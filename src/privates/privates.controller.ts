@@ -1,6 +1,6 @@
-import { MainConfig } from '@config/main.config.js';
 import { PrivatesConfig } from '@config/privates.config.js';
 import { Injectable } from '@nestjs/common';
+import { isPrivatesAdmin } from '@shared/utils/is-privates-admin.util.js';
 import { AuditLogEvent, type GuildAuditLogs, type GuildChannel, type Snowflake, type VoiceChannel } from 'discord.js';
 import { Context, type ContextOf, On, Once } from 'necord';
 import { privatesLocker } from './constants/privates-locker.const.js';
@@ -104,14 +104,13 @@ export class PrivatesController {
 			return;
 		}
 
-		const executor = await channel.client.users.fetch(executorId).catch(() => null);
+		if (executorId === channel.client.user.id || executorId === privateChannel.userId) {
+			return;
+		}
 
-		if (
-			executorId !== channel.client.user.id
-			&& executorId !== privateChannel.userId
-			&& !executor?.bot
-			&& !MainConfig.adminUserIds.includes(executorId)
-		) {
+		const executor = await (channel as GuildChannel).guild.members.fetch(executorId).catch(() => null);
+
+		if (!executor?.user.bot && !(executor && isPrivatesAdmin(executor))) {
 			await (channel as GuildChannel).edit({
 				permissionOverwrites: oldPermissions.cache,
 			});
@@ -176,7 +175,7 @@ export class PrivatesController {
 		}
 
 		if (await this.privatesService.isPrivateChannel(channel.id)) {
-			if (member.user.bot || MainConfig.adminUserIds.includes(member.id)) {
+			if (member.user.bot || isPrivatesAdmin(member)) {
 				return;
 			}
 
@@ -240,7 +239,7 @@ export class PrivatesController {
 		}
 
 		if (await this.privatesService.isPrivateChannel(newChannel.id)) {
-			if (member.user.bot || MainConfig.adminUserIds.includes(member.id)) {
+			if (member.user.bot || isPrivatesAdmin(member)) {
 				return;
 			}
 

@@ -1,10 +1,9 @@
-import { MainConfig } from '@config/main.config.js';
 import { PrivatesConfig } from '@config/privates.config.js';
 import { type CanActivate, type ExecutionContext, Injectable } from '@nestjs/common';
 import { CommandsException } from '@shared/exceptions/commands.exception.js';
 import { GuildMember } from 'discord.js';
 import { NecordExecutionContext } from 'necord';
-import { isMemberHaveRole } from '../utils/is-member-have-role.util.js';
+import { isPrivatesAdmin } from '../utils/is-privates-admin.util.js';
 
 @Injectable()
 export class AdministratorGuard implements CanActivate {
@@ -30,11 +29,7 @@ export class AdministratorGuard implements CanActivate {
 			return false;
 		}
 
-		if (
-			!MainConfig.adminUserIds.includes(command.member.id)
-			&& !guildConfig.adminUserIds.includes(command.member.id)
-			&& !isMemberHaveRole(command.member, guildConfig.adminRoleIds)
-		) {
+		if (!isPrivatesAdmin(command.member)) {
 			throw new CommandsException({
 				name: 'у Вас **недостаточно прав** для выполнения данной команды.',
 				silent: true,
