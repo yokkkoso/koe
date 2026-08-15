@@ -1,6 +1,7 @@
 import { PrivatesConfig } from '@config/privates.config.js';
 import { Injectable, UseGuards } from '@nestjs/common';
 import { AdministratorGuard } from '@shared/guards/administrator.guard.js';
+import { MessageFlags } from 'discord.js';
 import { Context, SlashCommand, type SlashCommandContext } from 'necord';
 import { PrivatesPanelFactory } from '../factory/privates-panel.factory.js';
 
@@ -24,7 +25,7 @@ export class PrivatesCommand {
 			return;
 		}
 
-		await interaction.deferReply();
+		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
 		const panel = await this.privatesPanelFactory.generatePanel(interaction.guildId!, interaction.user);
 
