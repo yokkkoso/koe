@@ -1,5 +1,7 @@
-import type { PrivateButtonType, PrivateChannel } from '@prisma-client';
+import type { PrivateChannel } from '@prisma-client';
+import type { PrivatesMessageDocument } from './types/privates-message.type.js';
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma-client';
 import {
 	ChannelType,
 	type GuildChannelCreateOptions,
@@ -135,80 +137,21 @@ export class PrivatesService {
 		});
 	}
 
-	public async updateButtonsPerRow (guildId: Snowflake, buttonsPerRow: number): Promise<void> {
+	public async updateMessage (guildId: Snowflake, message: PrivatesMessageDocument | null): Promise<void> {
+		const data = message === null ? Prisma.DbNull : message as unknown as Prisma.InputJsonObject;
+
 		await this.prismaService.privatesConfig.upsert({
 			where: {
 				guildId,
 			},
 			update: {
-				guildId,
-				buttonsPerRow,
+				message: data,
 			},
 			create: {
 				guildId,
-				buttonsPerRow,
+				message: data,
 			},
 		});
-	}
-
-	public async createButton (guildId: Snowflake, type: PrivateButtonType, emoji: string, position: number): Promise<void> {
-		await this.prismaService.privatesButton.create({
-			data: {
-				guildId,
-				type,
-				emoji,
-				position,
-			},
-		});
-	}
-
-	public async deleteButton (id: number): Promise<void> {
-		await this.prismaService.privatesButton.delete({
-			where: {
-				id,
-			},
-		});
-	}
-
-	public async swapButtonsPosition (firstButtonId: number, secondButtonId: number): Promise<void> {
-		const [
-			firstButton,
-			secondButton,
-		] = await this.prismaService.$transaction([
-			this.prismaService.privatesButton.findFirst({
-				where: {
-					id: firstButtonId,
-				},
-			}),
-			this.prismaService.privatesButton.findFirst({
-				where: {
-					id: secondButtonId,
-				},
-			}),
-		]);
-
-		if (!firstButton || !secondButton) {
-			return;
-		}
-
-		await this.prismaService.$transaction([
-			this.prismaService.privatesButton.update({
-				where: {
-					id: firstButtonId,
-				},
-				data: {
-					position: secondButton.position,
-				},
-			}),
-			this.prismaService.privatesButton.update({
-				where: {
-					id: secondButtonId,
-				},
-				data: {
-					position: firstButton.position,
-				},
-			}),
-		]);
 	}
 
 	public async getPrivateChannels (guildId: Snowflake): Promise<PrivateChannel[]> {
@@ -232,24 +175,6 @@ export class PrivatesService {
 			where: {
 				guildId,
 				userId,
-			},
-		}).then(Boolean);
-	}
-
-	public async isTypeAlreadyUsing (guildId: Snowflake, type: PrivateButtonType): Promise<boolean> {
-		return this.prismaService.privatesButton.findFirst({
-			where: {
-				guildId,
-				type,
-			},
-		}).then(Boolean);
-	}
-
-	public async isPositionAlreadyUsing (guildId: Snowflake, position: number): Promise<boolean> {
-		return this.prismaService.privatesButton.findFirst({
-			where: {
-				guildId,
-				position,
 			},
 		}).then(Boolean);
 	}

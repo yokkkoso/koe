@@ -9,7 +9,7 @@ Discord bot for private ("join-to-create") voice channels, written in TypeScript
 ## Features
 
 - **Join-to-create** channels: joining a designated voice channel instantly spawns a private room and moves the user into it.
-- Per-guild **interactive control panel** on buttons — which buttons to expose, their order, and the number of buttons per row are all configurable via the `/privates` slash command.
+- Per-guild **interactive control panel** on buttons — its look (embeds or Components V2), which buttons to expose and their layout are designed in [Messēji](https://messeji.yokkkoso.me) and imported into the bot via the `/privates` slash command.
 - Owner actions: access give / take, hide / show, lock / unlock, mute / unmute, rename, kick, transfer ownership, user limit.
 - **Ownership protection** — permission overrides made on a private channel by someone other than its owner are reverted via audit-log checks.
 - Empty private channels are auto-deleted; state is recovered on restart.
@@ -31,6 +31,8 @@ Environment variables (`.env`):
 |-----------------|------------------------------|
 | `DISCORD_TOKEN` | Bot token                    |
 | `DATABASE_URL`  | PostgreSQL connection string |
+| `MESSEJI_URL`   | Messēji base URL (default `https://messeji.yokkkoso.me`) |
+| `MESSEJI_API_TOKEN` | Optional. Bearer token of Messēji's `POST /api/share`; enables the short «Open in Messēji» link button in `/privates` |
 
 Runtime configuration is split across three files in `src/config/`:
 
@@ -88,7 +90,7 @@ For development use `yarn start:dev` (hot reload).
 
 ## Usage
 
-On a configured guild, run `/privates` with an account that has administrator rights — the bot replies with the panel configuration message. Add/remove buttons, reorder them, pick how many appear per row, then send the finalized panel to the channel where your users live. End users press the buttons on that panel to manage their own private voice room.
+On a configured guild, run `/privates` with an account that has administrator rights — the bot replies with the panel configuration message. Press «Open in Messēji» (the current panel is preloaded), design the message and its buttons there — every button gets a Koe action, one action per button — then «Copy for Koe», come back and «Import from Messēji» with the copied link (raw JSON is accepted too). Preview, then send the finalized panel to the channel where your users live. End users press the buttons on that panel to manage their own private voice room.
 
 ## License
 

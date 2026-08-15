@@ -65,13 +65,10 @@ export class PrivatesMessageSendController {
 	): Promise<void> {
 		const selected = channels.first() as TextBasedChannel;
 
-		const { embed, components } = await this.privateMessageFactory.generateMessage(interaction.guildId!);
+		const document = await this.privateMessageFactory.generateMessage(interaction.guildId!);
 
 		try {
-			await (selected as TextChannel).send({
-				embeds: [embed],
-				components,
-			});
+			await (selected as TextChannel).send(document);
 
 			await interaction.update({
 				embeds: [

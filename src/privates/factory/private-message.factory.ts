@@ -1,16 +1,18 @@
+import type { PrivatesMessageDocument } from '../types/privates-message.type.js';
 import { Injectable } from '@nestjs/common';
 import { baseEmbed } from '@shared/constants/base-embed.const.js';
 import {
 	ActionRowBuilder,
+	type APIMessageTopLevelComponent,
 	ButtonBuilder,
 	ButtonStyle,
-	type EmbedBuilder,
 	inlineCode,
 	type Snowflake,
 } from 'discord.js';
 import _ from 'lodash';
 import { PrivateButtonStrings } from '../constants/private-button-strings.const.js';
 import { PrivatesService } from '../privates.service.js';
+import { PRIVATE_ACTION_PREFIX, withDisabledButtons } from '../utils/validate-privates-message.util.js';
 
 @Injectable()
 export class PrivateMessageFactory {
@@ -21,49 +23,43 @@ export class PrivateMessageFactory {
 	public async generateMessage (
 		guildId: Snowflake,
 		disableButtons = false,
-	): Promise<{
-		embed: EmbedBuilder;
-		components: ActionRowBuilder<ButtonBuilder>[];
-	}> {
+	): Promise<PrivatesMessageDocument> {
+		const config = await this.privatesService.getPrivateConfig(guildId);
+
+		const document = config.message
+			? structuredClone(config.message as unknown as PrivatesMessageDocument)
+			: this.generateLegacyMessage(config.buttons, config.buttonsPerRow);
+
+		if (disableButtons && document.components) {
+			document.components = withDisabledButtons(document.components);
+		}
+
+		return document;
+	}
+
+	private generateLegacyMessage (
+		configButtons: { type: keyof typeof PrivateButtonStrings, emoji: string, position: number }[],
+		buttonsPerRow: number,
+	): PrivatesMessageDocument {
 		const embed = baseEmbed()
 			.setTitle('Управление приватной комнатой')
 			.setDescription('**Жми следующие кнопки, чтобы настроить свою комнату**\nИспользовать их можно только когда у тебя есть приватный канал');
 
-		const config = await this.privatesService.getPrivateConfig(guildId);
-
-		const configButtons = config.buttons.toSorted((a, b) => a.position - b.position);
-
 		const buttons: ButtonBuilder[] = [];
 		const embedFields: string[] = [];
 
-		configButtons.sort((a, b) => a.position - b.position);
-
-		for (const button of configButtons) {
-			if (!button) {
-				continue;
-			}
-
+		for (const button of configButtons.toSorted((a, b) => a.position - b.position)) {
 			buttons.push(
 				new ButtonBuilder()
 					.setEmoji(button.emoji)
 					.setStyle(ButtonStyle.Secondary)
-					.setCustomId(`privateAction/${button.type}`)
-					.setDisabled(disableButtons),
+					.setCustomId(`${PRIVATE_ACTION_PREFIX}${button.type}`),
 			);
 
 			embedFields.push(`${button.emoji} — ${inlineCode(PrivateButtonStrings[button.type])}`);
 		}
 
-		const actionRows: ActionRowBuilder<ButtonBuilder>[] = [];
-
-		for (const button of _.chunk(buttons, config.buttonsPerRow)) {
-			actionRows.push(
-				new ActionRowBuilder<ButtonBuilder>()
-					.addComponents(button),
-			);
-		}
-
-		for (const field of _.chunk(embedFields, config.buttonsPerRow)) {
+		for (const field of _.chunk(embedFields, buttonsPerRow)) {
 			embed.addFields({
 				name: '\u200B',
 				value: field.join('\n'),
@@ -72,8 +68,9 @@ export class PrivateMessageFactory {
 		}
 
 		return {
-			embed,
-			components: actionRows,
+			embeds: [embed.toJSON()],
+			components: _.chunk(buttons, buttonsPerRow).map((row) =>
+				new ActionRowBuilder<ButtonBuilder>().addComponents(row).toJSON() as APIMessageTopLevelComponent),
 		};
 	}
 }

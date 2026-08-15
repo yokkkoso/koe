@@ -1,6 +1,7 @@
 import { Injectable, UseGuards } from '@nestjs/common';
 import { ExecutorGuard } from '@shared/guards/executor.guard.js';
 import { ExpTimeGuard } from '@shared/guards/exp-time.guard.js';
+import { MessageFlags } from 'discord.js';
 import { Button, type ButtonContext, Context } from 'necord';
 import { PrivateMessageFactory } from '../../factory/private-message.factory.js';
 
@@ -15,12 +16,11 @@ export class PrivatesMessagePreviewController {
 	public async onMessagePreviewButton (
 		@Context() [interaction]: ButtonContext,
 	): Promise<void> {
-		const { embed, components } = await this.privateMessageFactory.generateMessage(interaction.guildId!, true);
+		const document = await this.privateMessageFactory.generateMessage(interaction.guildId!, true);
 
 		await interaction.reply({
-			embeds: [embed],
-			components,
-			ephemeral: true,
+			...document,
+			flags: MessageFlags.Ephemeral | (document.flags ?? 0),
 		}).catch(() => {});
 	}
 }

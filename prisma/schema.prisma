@@ -19,6 +19,7 @@ model PrivateChannel {
 model PrivatesConfig {
   guildId       String           @id
   buttonsPerRow Int              @default(5)
+  message       Json?
   buttons       PrivatesButton[]
 
   @@map("voice_privates_configs")

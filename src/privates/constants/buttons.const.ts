@@ -1,44 +1,25 @@
-import type { PrivatesButton } from '@prisma-client';
-import { ButtonBuilder, ButtonStyle, type Snowflake, StringSelectMenuBuilder } from 'discord.js';
-import { PrivateButtonStrings } from './private-button-strings.const.js';
+import { ButtonBuilder, ButtonStyle, type Snowflake } from 'discord.js';
 
-export const privatesMessageButtonAdd = (
+export const privatesMessageOpen = (url: string) => new ButtonBuilder()
+	.setURL(url)
+	.setLabel('Открыть в Messēji')
+	.setStyle(ButtonStyle.Link);
+
+export const privatesMessageImport = (
 	executorId: Snowflake,
 	expTime: number | string,
 ) => new ButtonBuilder()
-	.setCustomId(`privatesMessageButtonAdd/${expTime}/${executorId}`)
-	.setLabel('Добавить кнопку')
+	.setCustomId(`privatesMessageImport/${expTime}/${executorId}`)
+	.setLabel('Импортировать из Messēji')
 	.setStyle(ButtonStyle.Success);
 
-export const privatesMessageButtonDelete = (
+export const privatesMessageReset = (
 	executorId: Snowflake,
 	expTime: number | string,
 ) => new ButtonBuilder()
-	.setCustomId(`privatesMessageButtonDelete/${expTime}/${executorId}`)
-	.setLabel('Удалить кнопки')
+	.setCustomId(`privatesMessageReset/${expTime}/${executorId}`)
+	.setLabel('Сбросить к стандартному')
 	.setStyle(ButtonStyle.Danger);
-
-export const privatesMessageButtonsPerRow = (
-	executorId: Snowflake,
-	expTime: number | string,
-) => new ButtonBuilder()
-	.setCustomId(`privatesMessageButtonsPerRow/${expTime}/${executorId}`)
-	.setLabel('Изменить количество кнопок в линии')
-	.setStyle(ButtonStyle.Secondary);
-
-export const privatesMessageButtonPosition = (
-	executorId: Snowflake,
-	expTime: number | string,
-	buttons: PrivatesButton[],
-) => new StringSelectMenuBuilder()
-	.setCustomId(`privatesMessageButtonPosition/${expTime}/${executorId}`)
-	.setPlaceholder('Изменить позицию кнопки')
-	.setOptions(
-		buttons.map((button) => ({
-			label: `${button.position}) ${PrivateButtonStrings[button.type]}`,
-			value: button.id.toString(),
-		})),
-	);
 
 export const privatesMessagePreview = (
 	executorId: Snowflake,
@@ -62,4 +43,12 @@ export const privatesPanelReturnButton = (
 ) => new ButtonBuilder()
 	.setCustomId(`privatesPanelReturn/${expTime}/${executorId}`)
 	.setLabel('Вернуться назад')
+	.setStyle(ButtonStyle.Secondary);
+
+export const privatesMessageMigrate = (
+	executorId: Snowflake,
+	expTime: number | string,
+) => new ButtonBuilder()
+	.setCustomId(`privatesMessageMigrate/${expTime}/${executorId}`)
+	.setLabel('Перенести старую настройку')
 	.setStyle(ButtonStyle.Secondary);

@@ -47,6 +47,7 @@ export type PrivatesConfigMaxAggregateOutputType = {
 export type PrivatesConfigCountAggregateOutputType = {
   guildId: number
   buttonsPerRow: number
+  message: number
   _all: number
 }
 
@@ -72,6 +73,7 @@ export type PrivatesConfigMaxAggregateInputType = {
 export type PrivatesConfigCountAggregateInputType = {
   guildId?: true
   buttonsPerRow?: true
+  message?: true
   _all?: true
 }
 
@@ -164,6 +166,7 @@ export type PrivatesConfigGroupByArgs<ExtArgs extends runtime.Types.Extensions.I
 export type PrivatesConfigGroupByOutputType = {
   guildId: string
   buttonsPerRow: number
+  message: runtime.JsonValue | null
   _count: PrivatesConfigCountAggregateOutputType | null
   _avg: PrivatesConfigAvgAggregateOutputType | null
   _sum: PrivatesConfigSumAggregateOutputType | null
@@ -192,12 +195,14 @@ export type PrivatesConfigWhereInput = {
   NOT?: Prisma.PrivatesConfigWhereInput | Prisma.PrivatesConfigWhereInput[]
   guildId?: Prisma.StringFilter<"PrivatesConfig"> | string
   buttonsPerRow?: Prisma.IntFilter<"PrivatesConfig"> | number
+  message?: Prisma.JsonNullableFilter<"PrivatesConfig">
   buttons?: Prisma.PrivatesButtonListRelationFilter
 }
 
 export type PrivatesConfigOrderByWithRelationInput = {
   guildId?: Prisma.SortOrder
   buttonsPerRow?: Prisma.SortOrder
+  message?: Prisma.SortOrderInput | Prisma.SortOrder
   buttons?: Prisma.PrivatesButtonOrderByRelationAggregateInput
 }
 
@@ -207,12 +212,14 @@ export type PrivatesConfigWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.PrivatesConfigWhereInput[]
   NOT?: Prisma.PrivatesConfigWhereInput | Prisma.PrivatesConfigWhereInput[]
   buttonsPerRow?: Prisma.IntFilter<"PrivatesConfig"> | number
+  message?: Prisma.JsonNullableFilter<"PrivatesConfig">
   buttons?: Prisma.PrivatesButtonListRelationFilter
 }, "guildId">
 
 export type PrivatesConfigOrderByWithAggregationInput = {
   guildId?: Prisma.SortOrder
   buttonsPerRow?: Prisma.SortOrder
+  message?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PrivatesConfigCountOrderByAggregateInput
   _avg?: Prisma.PrivatesConfigAvgOrderByAggregateInput
   _max?: Prisma.PrivatesConfigMaxOrderByAggregateInput
@@ -226,50 +233,59 @@ export type PrivatesConfigScalarWhereWithAggregatesInput = {
   NOT?: Prisma.PrivatesConfigScalarWhereWithAggregatesInput | Prisma.PrivatesConfigScalarWhereWithAggregatesInput[]
   guildId?: Prisma.StringWithAggregatesFilter<"PrivatesConfig"> | string
   buttonsPerRow?: Prisma.IntWithAggregatesFilter<"PrivatesConfig"> | number
+  message?: Prisma.JsonNullableWithAggregatesFilter<"PrivatesConfig">
 }
 
 export type PrivatesConfigCreateInput = {
   guildId: string
   buttonsPerRow?: number
+  message?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   buttons?: Prisma.PrivatesButtonCreateNestedManyWithoutConfigInput
 }
 
 export type PrivatesConfigUncheckedCreateInput = {
   guildId: string
   buttonsPerRow?: number
+  message?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   buttons?: Prisma.PrivatesButtonUncheckedCreateNestedManyWithoutConfigInput
 }
 
 export type PrivatesConfigUpdateInput = {
   guildId?: Prisma.StringFieldUpdateOperationsInput | string
   buttonsPerRow?: Prisma.IntFieldUpdateOperationsInput | number
+  message?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   buttons?: Prisma.PrivatesButtonUpdateManyWithoutConfigNestedInput
 }
 
 export type PrivatesConfigUncheckedUpdateInput = {
   guildId?: Prisma.StringFieldUpdateOperationsInput | string
   buttonsPerRow?: Prisma.IntFieldUpdateOperationsInput | number
+  message?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   buttons?: Prisma.PrivatesButtonUncheckedUpdateManyWithoutConfigNestedInput
 }
 
 export type PrivatesConfigCreateManyInput = {
   guildId: string
   buttonsPerRow?: number
+  message?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type PrivatesConfigUpdateManyMutationInput = {
   guildId?: Prisma.StringFieldUpdateOperationsInput | string
   buttonsPerRow?: Prisma.IntFieldUpdateOperationsInput | number
+  message?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type PrivatesConfigUncheckedUpdateManyInput = {
   guildId?: Prisma.StringFieldUpdateOperationsInput | string
   buttonsPerRow?: Prisma.IntFieldUpdateOperationsInput | number
+  message?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type PrivatesConfigCountOrderByAggregateInput = {
   guildId?: Prisma.SortOrder
   buttonsPerRow?: Prisma.SortOrder
+  message?: Prisma.SortOrder
 }
 
 export type PrivatesConfigAvgOrderByAggregateInput = {
@@ -320,11 +336,13 @@ export type PrivatesConfigUpdateOneRequiredWithoutButtonsNestedInput = {
 export type PrivatesConfigCreateWithoutButtonsInput = {
   guildId: string
   buttonsPerRow?: number
+  message?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type PrivatesConfigUncheckedCreateWithoutButtonsInput = {
   guildId: string
   buttonsPerRow?: number
+  message?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type PrivatesConfigCreateOrConnectWithoutButtonsInput = {
@@ -346,11 +364,13 @@ export type PrivatesConfigUpdateToOneWithWhereWithoutButtonsInput = {
 export type PrivatesConfigUpdateWithoutButtonsInput = {
   guildId?: Prisma.StringFieldUpdateOperationsInput | string
   buttonsPerRow?: Prisma.IntFieldUpdateOperationsInput | number
+  message?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type PrivatesConfigUncheckedUpdateWithoutButtonsInput = {
   guildId?: Prisma.StringFieldUpdateOperationsInput | string
   buttonsPerRow?: Prisma.IntFieldUpdateOperationsInput | number
+  message?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 
@@ -387,6 +407,7 @@ export type PrivatesConfigCountOutputTypeCountButtonsArgs<ExtArgs extends runtim
 export type PrivatesConfigSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   guildId?: boolean
   buttonsPerRow?: boolean
+  message?: boolean
   buttons?: boolean | Prisma.PrivatesConfig$buttonsArgs<ExtArgs>
   _count?: boolean | Prisma.PrivatesConfigCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["privatesConfig"]>
@@ -394,19 +415,22 @@ export type PrivatesConfigSelect<ExtArgs extends runtime.Types.Extensions.Intern
 export type PrivatesConfigSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   guildId?: boolean
   buttonsPerRow?: boolean
+  message?: boolean
 }, ExtArgs["result"]["privatesConfig"]>
 
 export type PrivatesConfigSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   guildId?: boolean
   buttonsPerRow?: boolean
+  message?: boolean
 }, ExtArgs["result"]["privatesConfig"]>
 
 export type PrivatesConfigSelectScalar = {
   guildId?: boolean
   buttonsPerRow?: boolean
+  message?: boolean
 }
 
-export type PrivatesConfigOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"guildId" | "buttonsPerRow", ExtArgs["result"]["privatesConfig"]>
+export type PrivatesConfigOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"guildId" | "buttonsPerRow" | "message", ExtArgs["result"]["privatesConfig"]>
 export type PrivatesConfigInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   buttons?: boolean | Prisma.PrivatesConfig$buttonsArgs<ExtArgs>
   _count?: boolean | Prisma.PrivatesConfigCountOutputTypeDefaultArgs<ExtArgs>
@@ -422,6 +446,7 @@ export type $PrivatesConfigPayload<ExtArgs extends runtime.Types.Extensions.Inte
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     guildId: string
     buttonsPerRow: number
+    message: runtime.JsonValue | null
   }, ExtArgs["result"]["privatesConfig"]>
   composites: {}
 }
@@ -848,6 +873,7 @@ export interface Prisma__PrivatesConfigClient<T, Null = never, ExtArgs extends r
 export interface PrivatesConfigFieldRefs {
   readonly guildId: Prisma.FieldRef<"PrivatesConfig", 'String'>
   readonly buttonsPerRow: Prisma.FieldRef<"PrivatesConfig", 'Int'>
+  readonly message: Prisma.FieldRef<"PrivatesConfig", 'Json'>
 }
     
 
