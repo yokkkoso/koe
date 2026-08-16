@@ -5983,12 +5983,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"necord@npm:6.12.4":
-  version: 6.12.4
-  resolution: "necord@npm:6.12.4"
+"necord@npm:6.13.0":
+  version: 6.13.0
+  resolution: "necord@npm:6.13.0"
   dependencies:
     "@nuxt/opencollective": "npm:^0.4.1"
-    path-to-regexp: "npm:8.3.0"
+    path-to-regexp: "npm:8.4.2"
     tslib: "npm:^2.8.1"
   peerDependencies:
     "@nestjs/common": ^10.2.0 || ^11.0.0
@@ -5997,7 +5997,7 @@ __metadata:
     discord.js: ^14.0.1
     reflect-metadata: ^0.2.1
     rxjs: ^7.2.0
-  checksum: 10/19ec9329eead201cedc3b7ca21b5ec3b90429be011d711067532cfc13223d4e66525ff7f4555e719f63ad7ab82fe668657c00a098cc7f6d19f9589e4a17fbf6e
+  checksum: 10/99f9cb4f069145af9d680d6c334358af2969abf8f96b6ef4f9e0eb4ad0421f55522402d3173a3bae3a301717062483544d736ad81caf8de7dd028814ce369ed0
   languageName: node
   linkType: hard
 
@@ -6298,13 +6298,6 @@ __metadata:
     lru-cache: "npm:^11.0.0"
     minipass: "npm:^7.1.2"
   checksum: 10/2b4257422bcb870a4c2d205b3acdbb213a72f5e2250f61c80f79c9d014d010f82bdf8584441612c8e1fa4eb098678f5704a66fa8377d72646bad4be38e57a2c3
-  languageName: node
-  linkType: hard
-
-"path-to-regexp@npm:8.3.0":
-  version: 8.3.0
-  resolution: "path-to-regexp@npm:8.3.0"
-  checksum: 10/568f148fc64f5fd1ecebf44d531383b28df924214eabf5f2570dce9587a228e36c37882805ff02d71c6209b080ea3ee6a4d2b712b5df09741b67f1f3cf91e55a
   languageName: node
   linkType: hard
 
@@ -7604,7 +7597,7 @@ __metadata:
     dotenv: "npm:17.4.2"
     eslint: "npm:10.2.1"
     lodash: "npm:4.18.1"
-    necord: "npm:6.12.4"
+    necord: "npm:6.13.0"
     pg: "npm:8.20.0"
     prisma: "npm:7.8.0"
     reflect-metadata: "npm:0.2.2"
