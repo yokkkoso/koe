@@ -1,7 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { PrivateButtonType } from '@prisma-client';
 import { baseEmbed } from '@shared/constants/base-embed.const.js';
-import { ActionRowBuilder, MentionableSelectMenuBuilder, OverwriteType, type VoiceChannel } from 'discord.js';
+import { byIdButtonRow, userIdModal } from '@shared/constants/user-id-modal.const.js';
+import { fetchMemberById } from '@shared/utils/fetch-member-by-id.util.js';
+import {
+	ActionRowBuilder,
+	type APIRole,
+	MentionableSelectMenuBuilder,
+	type MentionableSelectMenuInteraction,
+	type ModalMessageModalSubmitInteraction,
+	OverwriteType,
+	type Role,
+	type User,
+	type VoiceChannel,
+} from 'discord.js';
 import {
 	Button,
 	type ButtonContext,
@@ -10,6 +22,8 @@ import {
 	type ISelectedUsers,
 	MentionableSelect,
 	type MentionableSelectContext,
+	Modal,
+	type ModalContext,
 	SelectedRoles,
 	SelectedUsers,
 } from 'necord';
@@ -55,6 +69,7 @@ export class PrivateAccessTakeController {
 							.setCustomId('privateAccessTakeChoose')
 							.setMaxValues(1),
 					),
+				byIdButtonRow('privateAccessTakeById'),
 			],
 			ephemeral: true,
 		});
@@ -65,6 +80,51 @@ export class PrivateAccessTakeController {
 		@Context() [interaction]: MentionableSelectContext,
 		@SelectedUsers() users: ISelectedUsers,
 		@SelectedRoles() roles: ISelectedRoles,
+	): Promise<void> {
+		const selected = users.first() ?? roles.first();
+		if (!selected) {
+			return;
+		}
+
+		await this.takeAccess(interaction, selected);
+	}
+
+	@Button('privateAccessTakeById')
+	public async onByIdButton (
+		@Context() [interaction]: ButtonContext,
+	): Promise<void> {
+		await interaction.showModal(userIdModal('privateAccessTakeByIdModal', PrivateButtonStrings[PrivateButtonType.ACCESS_TAKE]));
+	}
+
+	@Modal('privateAccessTakeByIdModal')
+	public async onByIdModal (
+		@Context() [interaction]: ModalContext,
+	): Promise<void> {
+		if (!interaction.isFromMessage()) {
+			return;
+		}
+
+		const member = await fetchMemberById(interaction.guild!, interaction.fields.getTextInputValue('userId'));
+
+		if (!member) {
+			await interaction.update({
+				embeds: [
+					baseEmbed()
+						.setTitle(PrivateButtonStrings[PrivateButtonType.ACCESS_TAKE])
+						.setThumbnail(interaction.user.displayAvatarURL({ extension: 'png' }))
+						.setDescription(`${interaction.user.toString()}, пользователь с таким **ID не найден** на сервере`),
+				],
+			});
+
+			return;
+		}
+
+		await this.takeAccess(interaction, member.user);
+	}
+
+	private async takeAccess (
+		interaction: MentionableSelectMenuInteraction | ModalMessageModalSubmitInteraction,
+		selected: APIRole | Role | User,
 	): Promise<void> {
 		const privateChannel = await this.privatesService.getPrivateChannelByUser(interaction.guildId!, interaction.user.id);
 
@@ -100,11 +160,6 @@ export class PrivateAccessTakeController {
 			return;
 		}
 
-		const selected = users.first() ?? roles.first();
-		if (!selected) {
-			return;
-		}
-
 		if ('username' in selected && selected.id === interaction.user.id) {
 			await interaction.update({
 				embeds: [
@@ -121,7 +176,7 @@ export class PrivateAccessTakeController {
 
 		const selectedPermissions = voiceChannel.permissionsFor(selected.id, false);
 
-		if (selectedPermissions && !selectedPermissions.has('Connect', false)) {
+		if (selectedPermissions && !selectedPermissions.has(['Connect', 'ViewChannel'], false)) {
 			await interaction.update({
 				embeds: [
 					baseEmbed()

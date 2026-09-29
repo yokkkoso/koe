@@ -1,12 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { PrivateButtonType } from '@prisma-client';
 import { baseEmbed } from '@shared/constants/base-embed.const.js';
-import { ActionRowBuilder, GuildMember, OverwriteType, UserSelectMenuBuilder, type VoiceChannel } from 'discord.js';
+import { byIdButtonRow, userIdModal } from '@shared/constants/user-id-modal.const.js';
+import { fetchMemberById } from '@shared/utils/fetch-member-by-id.util.js';
+import {
+	ActionRowBuilder,
+	GuildMember,
+	type ModalMessageModalSubmitInteraction,
+	OverwriteType,
+	UserSelectMenuBuilder,
+	type UserSelectMenuInteraction,
+	type VoiceChannel,
+} from 'discord.js';
 import {
 	Button,
 	type ButtonContext,
 	Context,
 	type ISelectedMembers,
+	Modal,
+	type ModalContext,
 	SelectedMembers,
 	UserSelect,
 	type UserSelectContext,
@@ -53,6 +65,7 @@ export class PrivateTransferController {
 							.setCustomId('privateTransferChoose')
 							.setMaxValues(1),
 					),
+				byIdButtonRow('privateTransferById'),
 			],
 			ephemeral: true,
 		});
@@ -62,6 +75,51 @@ export class PrivateTransferController {
 	public async onUserSelect (
 		@Context() [interaction]: UserSelectContext,
 		@SelectedMembers() members: ISelectedMembers,
+	): Promise<void> {
+		const selected = members.first();
+		if (!(selected instanceof GuildMember)) {
+			return;
+		}
+
+		await this.transfer(interaction, selected);
+	}
+
+	@Button('privateTransferById')
+	public async onByIdButton (
+		@Context() [interaction]: ButtonContext,
+	): Promise<void> {
+		await interaction.showModal(userIdModal('privateTransferByIdModal', PrivateButtonStrings[PrivateButtonType.TRANSFER]));
+	}
+
+	@Modal('privateTransferByIdModal')
+	public async onByIdModal (
+		@Context() [interaction]: ModalContext,
+	): Promise<void> {
+		if (!interaction.isFromMessage()) {
+			return;
+		}
+
+		const member = await fetchMemberById(interaction.guild!, interaction.fields.getTextInputValue('userId'));
+
+		if (!member) {
+			await interaction.update({
+				embeds: [
+					baseEmbed()
+						.setTitle(PrivateButtonStrings[PrivateButtonType.TRANSFER])
+						.setThumbnail(interaction.user.displayAvatarURL({ extension: 'png' }))
+						.setDescription(`${interaction.user.toString()}, пользователь с таким **ID не найден** на сервере`),
+				],
+			});
+
+			return;
+		}
+
+		await this.transfer(interaction, member);
+	}
+
+	private async transfer (
+		interaction: ModalMessageModalSubmitInteraction | UserSelectMenuInteraction,
+		selected: GuildMember,
 	): Promise<void> {
 		const privateChannel = await this.privatesService.getPrivateChannelByUser(interaction.guildId!, interaction.user.id);
 
@@ -97,12 +155,7 @@ export class PrivateTransferController {
 			return;
 		}
 
-		const selected = members.first();
-		if (!(selected instanceof GuildMember)) {
-			return;
-		}
-
-		if (!await this.privatesService.isUserHavePrivateChannel(interaction.guildId!, selected.id)) {
+		if (await this.privatesService.isUserHavePrivateChannel(interaction.guildId!, selected.id)) {
 			await interaction.reply({
 				embeds: [
 					baseEmbed()
